@@ -2,7 +2,6 @@
 
 namespace App\Database;
 
-use App\Config\DatabaseConfig;
 use PDO;
 use PDOException;
 

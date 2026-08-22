@@ -2,7 +2,7 @@
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-use App\Config\DatabaseConfig;
+use App\Database\DatabaseConfig;
 use App\Database\DatabaseManager;
 use App\Importer\UserImporter;
 
