@@ -5,13 +5,12 @@ USER root
 # Install PostgreSQL PHP extensions
 RUN install-php-extensions pdo_pgsql pgsql
 
-# Set web root and index file to user_upload.php
+# Set web root to project root directory
 ENV NGINX_WEB_ROOT="/var/www/html"
-ENV NGINX_INDEX_FILE="user_upload.php"
 ENV PHP_AUTORUN_SCHEDULE_WORKER="false"
 
-# Copy custom Nginx header buffer and fallback configuration
-COPY docker/php/nginx-custom.conf /etc/nginx/conf.d/headers.conf
+# Copy custom Nginx configuration to route directly to user_upload.php without index.php
+COPY docker/php/nginx-custom.conf /etc/nginx/conf.d/default.conf
 
 # Copy backend codebase
 COPY --chown=www-data:www-data . /var/www/html
