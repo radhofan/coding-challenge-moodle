@@ -2,7 +2,7 @@
 
 namespace App\Validator;
 
-use App\Model\UserRecord;
+use App\Dto\FinalUserRecDto;
 
 class UserValidator
 {
@@ -26,12 +26,10 @@ class UserValidator
             return false;
         }
 
-        // Standard filter_var check
         if (filter_var($email, FILTER_VALIDATE_EMAIL) === false) {
             return false;
         }
 
-        // Extra sanity check: ensure no multiple @ signs or spaces
         if (substr_count($email, '@') !== 1) {
             return false;
         }
@@ -41,7 +39,6 @@ class UserValidator
             return false;
         }
 
-        // Host must have a dot and valid format
         if (strpos($parts[1], '.') === false) {
             return false;
         }
@@ -54,7 +51,7 @@ class UserValidator
      *
      * @param array $rawRows Array of ['name' => ..., 'surname' => ..., 'email' => ...]
      * @param array $existingDbEmails Array of lowercase emails already in the database
-     * @return UserRecord[]
+     * @return FinalUserRecDto[]
      */
     public function validateBatch(array $rawRows, array $existingDbEmails = []): array
     {
@@ -86,14 +83,12 @@ class UserValidator
             } elseif (!$this->isValidEmail($formattedEmail)) {
                 $errors[] = 'Invalid email address format';
             } else {
-                // Uniqueness check within the CSV batch
                 if (isset($seenEmailsInBatch[$formattedEmail])) {
                     $errors[] = 'Duplicate email address in file';
                 } else {
                     $seenEmailsInBatch[$formattedEmail] = true;
                 }
 
-                // Uniqueness check against database
                 if (isset($existingDbEmailsSet[$formattedEmail])) {
                     $errors[] = 'Email address already exists in database';
                 }
@@ -101,7 +96,7 @@ class UserValidator
 
             $isValid = count($errors) === 0;
 
-            $records[] = new UserRecord(
+            $records[] = new FinalUserRecDto(
                 $rawName,
                 $rawSurname,
                 $rawEmail,

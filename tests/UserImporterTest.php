@@ -4,7 +4,7 @@ namespace Tests;
 
 use App\Parser\CsvParser;
 use App\Validator\UserValidator;
-use App\Model\UserRecord;
+use App\Dto\FinalUserRecDto;
 use PHPUnit\Framework\TestCase;
 
 class UserImporterTest extends TestCase

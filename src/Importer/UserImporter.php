@@ -3,7 +3,7 @@
 namespace App\Importer;
 
 use App\Database\DatabaseManager;
-use App\Model\UserRecord;
+use App\Dto\FinalUserRecDto;
 use App\Parser\CsvParser;
 use App\Validator\UserValidator;
 use PDO;
@@ -49,7 +49,7 @@ class UserImporter
             }
         }
 
-        /** @var UserRecord[] $records */
+        /** @var FinalUserRecDto[] $records */
         $records = $this->validator->validateBatch($rawRows, $existingEmails);
 
         $validCount = 0;
@@ -83,12 +83,12 @@ class UserImporter
             'imported' => $importedCount,
             'dry_run' => $dryRun,
             'db_error' => $dbError,
-            'records' => array_map(fn(UserRecord $r) => $r->toArray(), $records)
+            'records' => array_map(fn(FinalUserRecDto $r) => $r->toArray(), $records)
         ];
     }
 
     /**
-     * @param UserRecord[] $records
+     * @param FinalUserRecDto[] $records
      */
     private function insertRecords(array $records): int
     {

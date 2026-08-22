@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Model;
+namespace App\Dto;
 
-class UserRecord
+class FinalUserRecDto
 {
     private string $rawName;
     private string $rawSurname;
