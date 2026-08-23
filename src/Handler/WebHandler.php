@@ -32,6 +32,13 @@ class WebHandler
     public static function getCsvBody(): string
     {
         if (isset($_FILES['file']) && $_FILES['file']['error'] === UPLOAD_ERR_OK) {
+            $filename = $_FILES['file']['name'] ?? '';
+            if (!empty($filename) && strtolower(pathinfo($filename, PATHINFO_EXTENSION)) !== 'csv') {
+                throw new InvalidArgumentException('Invalid file type. File must be a .csv file.');
+            }
+            if (filesize($_FILES['file']['tmp_name']) > 52428800) {
+                throw new InvalidArgumentException('File size exceeds the maximum limit of 50 MB.');
+            }
             $content = file_get_contents($_FILES['file']['tmp_name']);
             if ($content === false) {
                 throw new RuntimeException('Failed to read uploaded file');
@@ -41,9 +48,15 @@ class WebHandler
 
         $rawBody = file_get_contents('php://input');
         if (!empty($rawBody)) {
+            if (strlen($rawBody) > 52428800) {
+                throw new InvalidArgumentException('File size exceeds the maximum limit of 50 MB.');
+            }
             if (str_starts_with(trim($rawBody), '{')) {
                 $json = json_decode($rawBody, true);
                 if (isset($json['csv_content'])) {
+                    if (strlen($json['csv_content']) > 52428800) {
+                        throw new InvalidArgumentException('File size exceeds the maximum limit of 50 MB.');
+                    }
                     return $json['csv_content'];
                 }
             }

@@ -64,4 +64,19 @@ class UserImporterTest extends TestCase
         $this->assertFalse($records[1]->isValid());
         $this->assertContains('Duplicate email address in file', $records[1]->getErrors());
     }
+
+    public function testFileExtensionValidation(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid file type. File must be a .csv file.');
+        $this->parser->parseFile(__DIR__ . '/../composer.json');
+    }
+
+    public function testFileSizeValidation(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('File size exceeds the maximum limit of 50 MB.');
+        $largeContent = str_repeat('a', 52428801);
+        $this->parser->parseString($largeContent);
+    }
 }

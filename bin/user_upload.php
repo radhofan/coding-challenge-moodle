@@ -45,6 +45,10 @@ if (PHP_SAPI === 'cli') {
     }
 
     $filePath = $options['file'];
+    if (strtolower(pathinfo($filePath, PATHINFO_EXTENSION)) !== 'csv') {
+        CliHandler::printError("Error: Invalid file type. File must be a .csv file.");
+        exit(1);
+    }
 
     // Check for dry run arg
     $dryRun = isset($options['dry-run']);

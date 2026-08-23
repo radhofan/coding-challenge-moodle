@@ -13,6 +13,14 @@ class CsvParser
             throw new InvalidArgumentException("CSV file does not exist or is not readable: {$filePath}");
         }
 
+        if (strtolower(pathinfo($filePath, PATHINFO_EXTENSION)) !== 'csv') {
+            throw new InvalidArgumentException("Invalid file type. File must be a .csv file.");
+        }
+
+        if (filesize($filePath) > 52428800) {
+            throw new InvalidArgumentException("File size exceeds the maximum limit of 50 MB.");
+        }
+
         $handle = fopen($filePath, 'r');
         if ($handle === false) {
             throw new RuntimeException("Unable to open CSV file: {$filePath}");
@@ -27,6 +35,10 @@ class CsvParser
 
     public function parseString(string $csvContent): array
     {
+        if (strlen($csvContent) > 52428800) {
+            throw new InvalidArgumentException("File size exceeds the maximum limit of 50 MB.");
+        }
+
         // Strip UTF-8 BOM if present at the beginning of the string
         $csvContent = preg_replace('/^\xEF\xBB\xBF/', '', $csvContent);
 
