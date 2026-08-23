@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<ruleset name="ProjectCodingStandard">
+    <description>PSR1, PSR12, and PER Coding Standard for User Import Application</description>
+
+    <file>src</file>
+    <file>bin</file>
+    <file>tests</file>
+    <file>user_upload.php</file>
+
+    <arg name="colors"/>
+    <arg value="p"/>
+
+    <!-- Include PSR-1 and PSR-12 Standards -->
+    <rule ref="PSR1"/>
+    <rule ref="PSR12"/>
+
+    <!--PER / PSR-4 custom requirements -->
+    <!--Note: PSR12 already incorporates PSR1 by default, and the PER standard is on top of PSR12, I am making this just for a placeholder -->
+    <rule ref="Generic.Files.OneClassPerFile"/>
+    <rule ref="Generic.Files.OneInterfacePerFile"/>
+    <rule ref="Generic.Files.LineLength">
+        <properties>
+            <property name="lineLimit" value="120"/>
+            <property name="absoluteLineLimit" value="150"/>
+        </properties>
+    </rule>
+</ruleset>

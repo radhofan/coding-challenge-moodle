@@ -65,7 +65,7 @@ class CsvParser
 
             if ($header === null) {
                 $header = array_map(fn($col) => strtolower(trim((string)$col)), $data);
-                
+
                 $nameIdx = array_search('name', $header, true);
                 $surnameIdx = array_search('surname', $header, true);
                 $emailIdx = array_search('email', $header, true);

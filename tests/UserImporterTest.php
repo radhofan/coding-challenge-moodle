@@ -45,7 +45,7 @@ class UserImporterTest extends TestCase
         $records = $this->validator->validateBatch($rows);
 
         $this->assertCount(2, $records);
-        
+
         $this->assertTrue($records[0]->isValid());
         $this->assertEquals('John', $records[0]->getFormattedName());
         $this->assertEquals('john.smith@example.com', $records[0]->getFormattedEmail());
