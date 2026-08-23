@@ -1,0 +1,278 @@
+################################################################################## OPENAPI 3.0.3 SPECIFICATION - USER IMPORT API
+openapi: 3.0.3
+info:
+  title: User Import API
+  version: 1.0.0
+  description: Complete OpenAPI 3.0 specification for CSV user validation and database import endpoints.
+
+servers:
+  - url: http://localhost:8000
+    description: Local development server
+
+##################################################################################  API PATHS AND ENDPOINTS
+paths:
+  # POST /api/preview - CSV Validation Preview (Dry Run)
+  /api/preview:
+    post:
+      summary: Preview CSV validation (Dry Run)
+      description: Parses and validates CSV data without persisting records to PostgreSQL.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - file
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: CSV file upload
+          application/json:
+            schema:
+              type: object
+              required:
+                - csv_content
+              properties:
+                csv_content:
+                  type: string
+                  description: Raw CSV text string
+      responses:
+        "200":
+          description: Validation preview successfully completed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ImportResultResponse"
+        "400":
+          $ref: "#/components/responses/400BadRequest"
+
+  # POST /api/import - CSV Database Import
+  /api/import:
+    post:
+      summary: Import CSV records into database
+      description: Validates and inserts valid user records into PostgreSQL within a transaction.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - file
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: CSV file upload
+          application/json:
+            schema:
+              type: object
+              required:
+                - csv_content
+              properties:
+                csv_content:
+                  type: string
+                  description: Raw CSV text string
+      responses:
+        "200":
+          description: Import execution successfully completed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ImportResultResponse"
+        "400":
+          $ref: "#/components/responses/400BadRequest"
+
+  # POST /api/create-table - Initialize Database Table
+  /api/create-table:
+    post:
+      summary: Create or rebuild users table
+      description: Drops and recreates the PostgreSQL users table and index.
+      responses:
+        "200":
+          description: Table created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - message
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Users table created successfully
+        "400":
+          $ref: "#/components/responses/400BadRequest"
+
+  # GET /api/users - Fetch All Imported Users
+  /api/users:
+    get:
+      summary: List all imported users
+      description: Returns all user records stored in PostgreSQL.
+      responses:
+        "200":
+          description: Array of stored user records
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - data
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/UserRecord"
+        "400":
+          $ref: "#/components/responses/400BadRequest"
+
+# REUSABLE COMPONENTS & SCHEMAS
+components:
+  # REUSABLE RESPONSES
+  responses:
+    400BadRequest:
+      description: Error payload returned when validation or database execution fails
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+
+  # REUSABLE DATA SCHEMAS
+  schemas:
+    # Response payload for /api/preview and /api/import
+    ImportResultResponse:
+      type: object
+      required:
+        - success
+        - total
+        - valid
+        - invalid
+        - imported
+        - dry_run
+        - records
+      properties:
+        success:
+          type: boolean
+          example: true
+        total:
+          type: integer
+          example: 10
+        valid:
+          type: integer
+          example: 8
+        invalid:
+          type: integer
+          example: 2
+        imported:
+          type: integer
+          example: 8
+        dry_run:
+          type: boolean
+          example: false
+        db_error:
+          type: string
+          nullable: true
+          example: null
+        records:
+          type: array
+          items:
+            $ref: "#/components/schemas/UserDetailRecord"
+
+    # Single user validation detail object inside records array
+    UserDetailRecord:
+      type: object
+      required:
+        - name
+        - surname
+        - email
+        - raw_name
+        - raw_surname
+        - raw_email
+        - status
+        - is_valid
+        - errors
+        - error_message
+      properties:
+        name:
+          type: string
+          example: John
+        surname:
+          type: string
+          example: Smith
+        email:
+          type: string
+          example: john.smith@example.com
+        raw_name:
+          type: string
+          example: john
+        raw_surname:
+          type: string
+          example: smith
+        raw_email:
+          type: string
+          example: JOHN.SMITH@EXAMPLE.COM
+        status:
+          type: string
+          example: Valid
+        is_valid:
+          type: boolean
+          example: true
+        errors:
+          type: array
+          items:
+            type: string
+          example: []
+        error_message:
+          type: string
+          example: ""
+
+    # User entity schema returned by GET /api/users
+    UserRecord:
+      type: object
+      required:
+        - id
+        - name
+        - surname
+        - email
+        - created_at
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: John
+        surname:
+          type: string
+          example: Smith
+        email:
+          type: string
+          example: john.smith@example.com
+        created_at:
+          type: string
+          format: date-time
+          example: "2026-08-23 20:00:00"
+
+    # Standard error response structure
+    ErrorResponse:
+      type: object
+      required:
+        - success
+        - error
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: string
+          example: No CSV file or CSV content provided

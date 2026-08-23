@@ -49,6 +49,7 @@ if (PHP_SAPI === 'cli') {
     // Check for dry run arg
     $dryRun = isset($options['dry-run']);
 
+    // Run the main process
     try {
         $result = $importer->processFile($filePath, $dryRun);
         CliHandler::printSummaryTable($result, $dryRun);
