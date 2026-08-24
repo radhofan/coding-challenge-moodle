@@ -1,6 +1,6 @@
 # A Simple User Import PHP App
 
-A full-stack CSV user import application built with PHP and React. This appparses CSV user files, validates input records, auto-formats names to title case and emails to lowercase, and imports valid user records into PostgreSQL.
+A full-stack CSV user import application built with PHP and React. This app parses CSV user files, validates input records, auto-formats names to title case and emails to lowercase, and imports valid user records into PostgreSQL.
 
 It provides both a PHP Command Line Interface (CLI) tool and a RESTful web API paired with a modern React interface.
 
@@ -8,9 +8,22 @@ It provides both a PHP Command Line Interface (CLI) tool and a RESTful web API p
 
 ![Validation Preview](public/preview.png)
 
-## Table of Contents
+## 📑 Table of Contents
 
-## How to run
+- [🚀 How to run](#-how-to-run)
+  - [Prerequisites](#prerequisites)
+  - [1. Docker (Recommended)](#1-docker-recommended)
+  - [2. Manual Setup (Native PHP & Node)](#2-manual-setup-native-php--node)
+- [⚙️ Methods](#️-methods)
+  - [Endpoints](#endpoints)
+  - [CLI args](#cli-args)
+- [💡 About](#-about)
+  - [N-Layered PHP-FPM + Nginx](#n-layered-php-fpm--nginx)
+  - [Folder structure and coding standards](#folder-structure-and-coding-standards)
+  - [Dockerize and Testing](#dockerize-and-testing)
+- [📋 Validation Matrix](#-validation-matrix)
+
+## 🚀 How to run
 
 ### Prerequisites
 
@@ -77,7 +90,7 @@ npm --prefix frontend install
 npm --prefix frontend run dev
 ```
 
-## Methods
+## ⚙️ Methods
 
 ### Endpoints
 
@@ -97,9 +110,69 @@ npm --prefix frontend run dev
 | `--create-table`    | Flag     | Rebuilds the PostgreSQL `users` table and unique email index          |
 | `--help`            | Flag     | Displays available CLI options and usage instructions                 |
 
-## Architecture Decisions and Tech Stack
+## 💡 About
 
-## Validation Matrix
+I am going to explain the architecture decisions and technologies chosen in this app.
+Starting with the technology stack itself, there are a lot of ways to build this. You can do the traditional way of using PHP-FPM + Nginx/Apache route combined, you can also take a more modern approach using FrankenPHP or RoadRunner, heck even Laravel is possible although it is a bit overkill for this small size, you can even make a bare PHP backend server from scratch.
+
+However, for the purpose of this assignment, I will be using PHP-FPM + Nginx with some much-needed libraries for better maintainability. I chose this stack because it is common, developer-friendly, and simple for this app.
+
+Here you can see the stack architecture, in which we will be using the N-Layered architecture, which is a great choice for this demo user import app.
+
+### N-Layered PHP-FPM + Nginx
+
+<div align="center">
+
+![Technology Stack](public/stack.png)
+
+</div>
+
+For simplicity and fast setup, we will also be using Docker alongside the [serversideup/php:8.4-fpm-nginx](https://github.com/serversideup/docker-php) Docker image where we can combine Nginx, PHP-FPM, and our core PHP code in a single deployable Docker container. We will also be deploying the frontend and PostgreSQL in their own Docker containers.
+
+### Folder structure and coding standards
+
+Designing the folder structure is also very important. I am going for the [PHP-PDS Skeleton](https://github.com/php-pds/skeleton) repository which has 2.4k stars and is defined by the PHP-PDS community to standardize PHP packages.
+
+Essentially it is a module-based approach similar to Go-based backends, where there will be one entrypoint for the app, in this case `user_upload.php` both for web and CLI. They will be using the underlying packages from `src` downstream which implements dependency injection and concern separation.
+
+```bash
+.
+├── bin/
+│   └── user_upload.php
+├── docker/
+├── frontend/
+├── public/
+├── src/
+│   ├── Database/
+│   ├── Dto/
+│   ├── Handler/
+│   ├── Importer/
+│   ├── Parser/
+│   └── Validator/
+├── tests/
+├── .env
+├── composer.json
+├── docker-compose.yml
+├── openapi.yaml
+├── phpcs.xml
+└── user_upload.php
+```
+
+PHP coding standard is also an important implementation detail that we need to establish. Luckily there already exists some code-based code quality checker like [PHP_CodeSniffer](https://github.com/PHPCSStandards/PHP_CodeSniffer) defined in `phpcs.xml` in this project. We will define PSR-1, PSR-4, PSR-12, and the PER standard there. This is great because we can always check our work quality after a coding session.
+
+We also define an `openapi.yaml` file for backend contracts which is not necessary for this app, but I use it to visualize during the development process. I check my APIs using the [Swagger Editor](https://editor.swagger.io/).
+
+### Dockerize and Testing
+
+We will be dockerizing the application which allows us to run the complete environment without anyone blaming their machine for being different again. Using Docker Compose (`docker-compose.yml`), we orchestrate three isolated services: the PHP-FPM + Nginx backend container, the React Vite frontend container, and a PostgreSQL 16 database container.
+
+We also define some simple tests for quality assurance and to automate business logic. For unit testing, we use [PHPUnit 13](https://phpunit.de/) in `tests/UserImporterTest.php` to verify core business logic including name formatting, email normalization, email format validation, batch duplicate detection, and file limit checks. To run it, please do:
+
+```bash
+vendor/bin/phpunit tests/UserImporterTest.php
+```
+
+## 📋 Validation Matrix
 
 Essentially, this is my own methodology to distinguish and separate validation places, since in big applications, validation can happen in both frontend and backend, and tracking and managing code can be difficult.
 
