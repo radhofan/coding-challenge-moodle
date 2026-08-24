@@ -1,14 +1,26 @@
-# A Simple User Import PHP App
+# User Import Tool
 
-A full-stack CSV user import application built with PHP and React. This app parses CSV user files, validates input records, auto-formats names to title case and emails to lowercase, and imports valid user records into PostgreSQL.
-
-It provides both a PHP Command Line Interface (CLI) tool and a RESTful web API paired with a modern React interface.
+Importing large sets of users from a spreadsheet into a system is a common administrative task. This project demonstrates a complete CSV user import workflow with automatic validation and formatting, available through both a web interface and a command-line tool.
 
 Please read [About](#-about) section for architecture decisions.
 
-<!-- ![Application Overview](public/overview.png) -->
+### Project Demo
 
-![Validation Preview](public/preview.png)
+**Step 1: Upload a CSV file**
+
+![Upload dashboard](public/dashboard.png)
+
+**Step 2: Preview validation results**
+
+![Validation preview showing valid and invalid records](public/preview.png)
+
+**Step 3: Confirm and import**
+
+![Import confirmation](public/import.png)
+
+**Step 4: See the final result**
+
+![Import complete](public/imported.png)
 
 ## 📑 Table of Contents
 
