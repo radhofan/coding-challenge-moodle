@@ -57,6 +57,7 @@ export default function App() {
     try {
       const data = await importCsv(selectedFile, csvText);
       setImportResult(data);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "An error occurred during user import"
