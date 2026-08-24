@@ -30,7 +30,7 @@ Please read [About](#-about) section for architecture decisions.
 ### Prerequisites
 
 - **Docker Setup**: Docker Engine & Docker Compose
-- **Manual Setup**: PHP 8.1+ (with `pdo_pgsql` extension enabled), Composer, Node.js 18+, and PostgreSQL 16
+- **Manual Setup**: PHP 8.3+ (with `pdo_pgsql` extension enabled), Composer, Node.js 18+, and PostgreSQL 16
 
 ### 1. Docker (Recommended)
 
