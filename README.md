@@ -4,6 +4,8 @@ A full-stack CSV user import application built with PHP and React. This app pars
 
 It provides both a PHP Command Line Interface (CLI) tool and a RESTful web API paired with a modern React interface.
 
+Please read [About](#-about) section for architecture decisions.
+
 <!-- ![Application Overview](public/overview.png) -->
 
 ![Validation Preview](public/preview.png)
